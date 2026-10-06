@@ -79,7 +79,7 @@ if ([Text.Encoding]::ASCII.GetString($b, 0, 2) -ne 'OK') { throw 'A szerver elut
 # --- Manifest ---
 Write-Host 'Fajllista fogadasa (a szerver most jarja be a konyvtarat)...'
 Read-Exact $bs $b 4
-$count = [BitConverter]::ToUInt32($b, 0)
+$count = [int][BitConverter]::ToUInt32($b, 0)
 $isDir = New-Object bool[] $count
 $sizes = New-Object long[] $count
 $mtimes = New-Object long[] $count
@@ -152,7 +152,7 @@ while ($true) {
                 $nextReport = $sw.ElapsedMilliseconds + 1000
                 $sec = $sw.Elapsed.TotalSeconds
                 $rate = $doneBytes / $sec
-                $eta = if ($rate -gt 0) { [TimeSpan]::FromSeconds([int](($needBytes - $doneBytes) / $rate)) } else { '?' }
+                $eta = if ($rate -gt 0) { [TimeSpan]::FromSeconds([Math]::Min([Math]::Floor(($needBytes - $doneBytes) / $rate), 31536000)) } else { '?' }
                 [Console]::Write(("`r{0}/{1} fajl  {2} / {3}  {4}/s  hatravan: {5}      " -f
                         $doneFiles, $need, (Fmt $doneBytes), (Fmt $needBytes), (Fmt $rate), $eta))
             }
